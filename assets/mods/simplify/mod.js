@@ -405,7 +405,7 @@
 			document.createEvent('Event').initEvent('mapUnloaded', true, true);
 		}
 		async _postInitialize(){
-			this._initializeFont();
+			await this._initializeFont();
 			this._initializeOptions();
 			this._initializeDependencyTab();
 			
@@ -438,7 +438,7 @@
 				const index = list.tabz.length;
 				gui.MOD_MENU_TAB_INDEXES.DEPS = index;
 				list.tabz.push({
-					name: 'Deps', icon: 'lore-others',
+					name: 'Deps', icon: 'simplify-deps',
 					populateFunc: list.populateDependencies,
 					simplifyDependencyTab: true
 				});
@@ -501,6 +501,17 @@
 			
 			this.font.prepareMapping(ICON_MAPPING, page);
 			this.font.setMapping(ICON_MAPPING);
+
+			const dependencies = new cc.ig.Font('mods/simplify/media/deps-icon.png', 16, 2001);
+			const dependencyPage = this.font.pushIconSet(dependencies);
+			this.font.setMapping({ 'simplify-deps': [dependencyPage, 0] });
+			// Tab text caches its glyphs; build it only after the font image is ready.
+			return new Promise(resolve => dependencies.addLoadListener({
+				onLoadableComplete(loaded) {
+					if (!loaded) console.error('Could not load the Deps tab icon.');
+					resolve();
+				}
+			}));
 		}
 		_initializeOptions(){
 			const mods = window.inactiveMods
